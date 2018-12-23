@@ -58,12 +58,19 @@ public class MainActivity extends AppCompatActivity {
     private int mResumeWindow;
     private long mResumePosition;
 
+    MyFragment myFragment;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-        bundle = null;
+
+        myFragment = new MyFragment();
+
+        FragmentManager fragmentManager = getSupportFragmentManager();
+
+        fragmentManager.beginTransaction().add(R.id.main_media_frame,myFragment).commit();
+//        bundle = null;
 //        mExoPlayerView = findViewById(R.id.playerview);
 
 //        if (savedInstanceState != null) {
@@ -73,122 +80,123 @@ public class MainActivity extends AppCompatActivity {
 //        }
     }
 
-    @Override
-    public void onResume() {
-        super.onResume();
-        if (mExoPlayerView == null) {
 
-            mExoPlayerView =  findViewById(R.id.playerview);
-            initFullscreenDialog();
-            initFullscreenButton();
-
-            if (getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE) {
-                requestWindowFeature(Window.FEATURE_NO_TITLE);
-                getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN,
-                        WindowManager.LayoutParams.FLAG_FULLSCREEN);
-                openFullscreenDialog();
-            }
-
-            Uri uri = Uri.parse(PATH);
-            String userAgent = Util.getUserAgent(this, getApplicationContext().getApplicationInfo().packageName);
-
-//            DefaultHttpDataSourceFactory httpDataSourceFactory = new DefaultHttpDataSourceFactory(userAgent, null, DefaultHttpDataSource.DEFAULT_CONNECT_TIMEOUT_MILLIS, DefaultHttpDataSource.DEFAULT_READ_TIMEOUT_MILLIS, true);
-//            DefaultDataSourceFactory dataSourceFactory = new DefaultDataSourceFactory(getContext(), null, httpDataSourceFactory);
-            DataSource.Factory dataSourceFactory = new DefaultDataSourceFactory(this, userAgent);
-
-            mVideoSource = new ExtractorMediaSource(uri, dataSourceFactory, new DefaultExtractorsFactory(), null, null);
-        }
-
-        initExoPlayer();
-
-        if (mExoPlayerFullscreen) {
-            ((ViewGroup) mExoPlayerView.getParent()).removeView(mExoPlayerView);
-            mFullScreenDialog.addContentView(mExoPlayerView, new ViewGroup.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT));
-            mFullScreenIcon.setImageDrawable(ContextCompat.getDrawable(this, R.drawable.ic_fullscreen_skrink));
-            mFullScreenDialog.show();
-        }
-    }
-
-
-    private void initExoPlayer() {
+    //    @Override
+//    public void onResume() {
+//        super.onResume();
+//        if (mExoPlayerView == null) {
+//
+//            mExoPlayerView =  findViewById(R.id.playerview);
+//            initFullscreenDialog();
+//            initFullscreenButton();
+//
+//            if (getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE) {
+//                requestWindowFeature(Window.FEATURE_NO_TITLE);
+//                getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN,
+//                        WindowManager.LayoutParams.FLAG_FULLSCREEN);
+//                openFullscreenDialog();
+//            }
+//
+//            Uri uri = Uri.parse(PATH);
+//            String userAgent = Util.getUserAgent(this, getApplicationContext().getApplicationInfo().packageName);
+//
+////            DefaultHttpDataSourceFactory httpDataSourceFactory = new DefaultHttpDataSourceFactory(userAgent, null, DefaultHttpDataSource.DEFAULT_CONNECT_TIMEOUT_MILLIS, DefaultHttpDataSource.DEFAULT_READ_TIMEOUT_MILLIS, true);
+////            DefaultDataSourceFactory dataSourceFactory = new DefaultDataSourceFactory(getContext(), null, httpDataSourceFactory);
+//            DataSource.Factory dataSourceFactory = new DefaultDataSourceFactory(this, userAgent);
+//
+//            mVideoSource = new ExtractorMediaSource(uri, dataSourceFactory, new DefaultExtractorsFactory(), null, null);
+//        }
+//
+//        initExoPlayer();
+//
+//        if (mExoPlayerFullscreen) {
+//            ((ViewGroup) mExoPlayerView.getParent()).removeView(mExoPlayerView);
+//            mFullScreenDialog.addContentView(mExoPlayerView, new ViewGroup.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT));
+//            mFullScreenIcon.setImageDrawable(ContextCompat.getDrawable(this, R.drawable.ic_fullscreen_skrink));
+//            mFullScreenDialog.show();
+//        }
+//    }
 
 
-        BandwidthMeter bandwidthMeter = new DefaultBandwidthMeter();
-
-        TrackSelection.Factory videoTrackSelectionFactory = new AdaptiveTrackSelection.Factory(bandwidthMeter);
-        TrackSelector trackSelector = new DefaultTrackSelector(videoTrackSelectionFactory);
-        player = ExoPlayerFactory.newSimpleInstance(this, trackSelector);
-        mExoPlayerView.setPlayer(player);
-        player.prepare(mVideoSource);
-
-
-
-
-        if(bundle!=null){
-            int resumeWindow = bundle.getInt(STATE_RESUME_WINDOW);
-            long resumePostion = bundle.getLong(STATE_RESUME_POSITION);
-
-            player.seekTo(resumeWindow,resumePostion);
-
-            player.setPlayWhenReady(false);
-        }else {
-            player.setPlayWhenReady(true);
-        }
-
-    }
-
-
-    private void initFullscreenDialog(){
-        mFullScreenDialog = new Dialog(this, android.R.style.Theme_Black_NoTitleBar_Fullscreen) {
-            public void onBackPressed() {
-                if (mExoPlayerFullscreen)
-                    closeFullscreenDialog();
-                super.onBackPressed();
-            }
-        };
-    }
+//    private void initExoPlayer() {
+//
+//
+//        BandwidthMeter bandwidthMeter = new DefaultBandwidthMeter();
+//
+//        TrackSelection.Factory videoTrackSelectionFactory = new AdaptiveTrackSelection.Factory(bandwidthMeter);
+//        TrackSelector trackSelector = new DefaultTrackSelector(videoTrackSelectionFactory);
+//        player = ExoPlayerFactory.newSimpleInstance(this, trackSelector);
+//        mExoPlayerView.setPlayer(player);
+//        player.prepare(mVideoSource);
+//
+//
+//
+//
+//        if(bundle!=null){
+//            int resumeWindow = bundle.getInt(STATE_RESUME_WINDOW);
+//            long resumePostion = bundle.getLong(STATE_RESUME_POSITION);
+//
+//            player.seekTo(resumeWindow,resumePostion);
+//
+//            player.setPlayWhenReady(false);
+//        }else {
+//            player.setPlayWhenReady(true);
+//        }
+//
+//    }
 
 
-    private void closeFullscreenDialog() {
-        ((ViewGroup) mExoPlayerView.getParent()).removeView(mExoPlayerView);
-        ((FrameLayout) findViewById(R.id.main_media_frame)).addView(mExoPlayerView);
-        mExoPlayerFullscreen = false;
-        mFullScreenDialog.dismiss();
-        mFullScreenIcon.setImageDrawable(ContextCompat.getDrawable(this, R.drawable.ic_fullscreen_expand));
-    }
+//    private void initFullscreenDialog(){
+//        mFullScreenDialog = new Dialog(this, android.R.style.Theme_Black_NoTitleBar_Fullscreen) {
+//            public void onBackPressed() {
+//                if (mExoPlayerFullscreen)
+//                    closeFullscreenDialog();
+//                super.onBackPressed();
+//            }
+//        };
+//    }
 
-    private void openFullscreenDialog() {
 
-        ((ViewGroup) mExoPlayerView.getParent()).removeView(mExoPlayerView);
-        mFullScreenDialog.addContentView(mExoPlayerView, new ViewGroup.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT));
-        mFullScreenIcon.setImageDrawable(ContextCompat.getDrawable(this, R.drawable.ic_fullscreen_skrink));
-        mExoPlayerFullscreen = true;
-        mFullScreenDialog.show();
-    }
+//    private void closeFullscreenDialog() {
+//        ((ViewGroup) mExoPlayerView.getParent()).removeView(mExoPlayerView);
+//        ((FrameLayout) findViewById(R.id.main_media_frame)).addView(mExoPlayerView);
+//        mExoPlayerFullscreen = false;
+//        mFullScreenDialog.dismiss();
+//        mFullScreenIcon.setImageDrawable(ContextCompat.getDrawable(this, R.drawable.ic_fullscreen_expand));
+//    }
 
-    @Override
-    protected void onStop() {
-        super.onStop();
-        mExoPlayerView.setPlayer(null);
-        player.release();
-        player = null;
-    }
+//    private void openFullscreenDialog() {
+//
+//        ((ViewGroup) mExoPlayerView.getParent()).removeView(mExoPlayerView);
+//        mFullScreenDialog.addContentView(mExoPlayerView, new ViewGroup.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT));
+//        mFullScreenIcon.setImageDrawable(ContextCompat.getDrawable(this, R.drawable.ic_fullscreen_skrink));
+//        mExoPlayerFullscreen = true;
+//        mFullScreenDialog.show();
+//    }
 
-    private void initFullscreenButton() {
+//    @Override
+//    protected void onStop() {
+//        super.onStop();
+//        mExoPlayerView.setPlayer(null);
+//        player.release();
+//        player = null;
+//    }
 
-        PlaybackControlView controlView = mExoPlayerView.findViewById(R.id.exo_controller);
-        mFullScreenIcon = controlView.findViewById(R.id.exo_fullscreen_icon);
-        mFullScreenButton = controlView.findViewById(R.id.exo_fullscreen_button);
-        mFullScreenButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                if (!mExoPlayerFullscreen)
-                    openFullscreenDialog();
-                else
-                    closeFullscreenDialog();
-            }
-        });
-    }
+//    private void initFullscreenButton() {
+//
+//        PlaybackControlView controlView = mExoPlayerView.findViewById(R.id.exo_controller);
+//        mFullScreenIcon = controlView.findViewById(R.id.exo_fullscreen_icon);
+//        mFullScreenButton = controlView.findViewById(R.id.exo_fullscreen_button);
+//        mFullScreenButton.setOnClickListener(new View.OnClickListener() {
+//            @Override
+//            public void onClick(View v) {
+//                if (!mExoPlayerFullscreen)
+//                    openFullscreenDialog();
+//                else
+//                    closeFullscreenDialog();
+//            }
+//        });
+//    }
 
 
 
@@ -214,32 +222,32 @@ public class MainActivity extends AppCompatActivity {
 
 
 
-    @Override
-    protected void onSaveInstanceState(Bundle outState) {
-        super.onSaveInstanceState(outState);
-        long ResumePosition = player.getCurrentPosition();
-        int ResumeWindow = player.getCurrentWindowIndex();
-        bundle = outState;
-        bundle.putBoolean(STATE_PLAYER_FULLSCREEN,mExoPlayerFullscreen);
-        bundle.putInt(STATE_RESUME_WINDOW, ResumeWindow);
-        bundle.putLong(STATE_RESUME_POSITION, ResumePosition);
+//    @Override
+//    protected void onSaveInstanceState(Bundle outState) {
+//        super.onSaveInstanceState(outState);
+//        long ResumePosition = player.getCurrentPosition();
+//        int ResumeWindow = player.getCurrentWindowIndex();
+//        bundle = outState;
+//        bundle.putBoolean(STATE_PLAYER_FULLSCREEN,mExoPlayerFullscreen);
+//        bundle.putInt(STATE_RESUME_WINDOW, ResumeWindow);
+//        bundle.putLong(STATE_RESUME_POSITION, ResumePosition);
+//
+//    }
 
-    }
 
 
-
-    @Override
-    public void onConfigurationChanged(Configuration newConfig) {
-        super.onConfigurationChanged(newConfig);
-
-        if (newConfig.orientation == Configuration.ORIENTATION_LANDSCAPE){
-            openFullscreenDialog();
-        }
-        else {
-            closeFullscreenDialog();
-        }
-
-    }
+//    @Override
+//    public void onConfigurationChanged(Configuration newConfig) {
+//        super.onConfigurationChanged(newConfig);
+//
+//        if (newConfig.orientation == Configuration.ORIENTATION_LANDSCAPE){
+//            openFullscreenDialog();
+//        }
+//        else {
+//            closeFullscreenDialog();
+//        }
+//
+//    }
 
 
 //    @Override
