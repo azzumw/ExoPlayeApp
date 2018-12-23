@@ -10,6 +10,8 @@ import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.Window;
+import android.view.WindowManager;
 import android.widget.FrameLayout;
 import android.widget.ImageView;
 
@@ -80,6 +82,12 @@ public class MainActivity extends AppCompatActivity {
             initFullscreenDialog();
             initFullscreenButton();
 
+            if (getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE) {
+                requestWindowFeature(Window.FEATURE_NO_TITLE);
+                getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN,
+                        WindowManager.LayoutParams.FLAG_FULLSCREEN);
+                openFullscreenDialog();
+            }
 
             Uri uri = Uri.parse(PATH);
             String userAgent = Util.getUserAgent(this, getApplicationContext().getApplicationInfo().packageName);
